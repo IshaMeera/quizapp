@@ -1,7 +1,9 @@
-import { DefaultSession, NextAuthOptions, getServerSession } from "next-auth";
+import { 
+    type DefaultSession,
+    type NextAuthOptions, getServerSession } from "next-auth";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "./db";
-import GoggleProvider from "next-auth/providers/google"
+import GoogleProvider from "next-auth/providers/google"
 
 declare module 'next-auth'{
     interface Session extends DefaultSession{
@@ -20,7 +22,7 @@ export const authOptions: NextAuthOptions = {
     session: {
         strategy: 'jwt'
     },
-
+     secret: process.env.NEXTAUTH_SECRET,
     callbacks: {
         jwt:async ({token}) => {
             const db_user = await prisma.user.findFirst({
@@ -46,10 +48,10 @@ export const authOptions: NextAuthOptions = {
         }
     },
 
-    secret: process.env.NEXTAUTH_SECRET,
+    //secret: process.env.NEXTAUTH_SECRET,
     adapter: PrismaAdapter(prisma),
     providers:[
-        GoggleProvider({
+        GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID as string,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
         })  
