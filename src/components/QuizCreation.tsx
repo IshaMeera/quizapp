@@ -48,9 +48,9 @@ const QuizCreation = (props: Props) => {
       },{
         onSuccess:({gameId}) =>{
           if (form.getValues("type")=="open_ended"){
-            router.push('/play/open_ended/${gameId}');
+            router.push(`/play/open_ended/${gameId}`);
           }else{
-            router.push('/play/mcq/${gameId}');
+            router.push(`/play/mcq/${gameId}`);
           }
         }
       })
