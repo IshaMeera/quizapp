@@ -75,6 +75,7 @@ model topic_count {
   count Int
 }
 
+
 model Question {
   id                String   @id @default(cuid())
   question          String

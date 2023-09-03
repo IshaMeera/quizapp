@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import React from 'react'
 import QuizMeCard from '@/components/dashboard/QuizMeCard'
 import HistoryCard from '@/components/dashboard/HistoryCard'
-import HotTopicsCard from '@/components/dashboard/HotTopicsCard'
+import HotTopicsCard from '@/app/dashboard/HotTopicsCard'
 import RecentActivities from '@/components/dashboard/RecentActivities'
 
 type Props = {}

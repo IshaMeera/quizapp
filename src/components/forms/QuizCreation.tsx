@@ -4,8 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui
 import {useForm} from 'react-hook-form'
 import { z } from 'zod'
 import { quizCreationSchema } from '@/schemas/form/quiz'
-import {zodResolver} from '@hookform/resolvers/zod'
-import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '../ui/form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '../ui/form'
 import { Button } from '../ui/button'
 import { Input } from "@/components/ui/input"
 import { BookOpen, CopyCheck } from 'lucide-react'
@@ -13,13 +13,18 @@ import { Separator } from '../ui/separator'
 import {useMutation} from '@tanstack/react-query'
 import axios from 'axios'
 import { useRouter } from 'next/navigation'
+import LoadingQuestions from '../LoadingQuestions'
 
-type Props = {}
+type Props = {
+  topicParam: string
+};
 
 type Input = z.infer<typeof quizCreationSchema>
 
-const QuizCreation = (props: Props) => {
+const QuizCreation = ({topicParam}: Props) => {
   const router = useRouter()
+  const [showLoader, setShowLoader] = React.useState(false);
+  const [finished, setFinished] = React.useState(false);
   const  {mutate: getQuestions, isLoading} = useMutation({
     mutationFn: async({amount, topic, type}:Input) =>{
       const response = await axios.post("/api/game",{amount,topic,type,});
@@ -30,29 +35,43 @@ const QuizCreation = (props: Props) => {
      const form = useForm<Input>({
        resolver: zodResolver(quizCreationSchema),
        defaultValues: {
-        topic: "",
+        topic: topicParam,
         type:"open_ended",
         amount: 3,
        },
      })
 
      function onSubmit(input: Input){
+      setShowLoader(true)
       getQuestions({
         amount: input.amount,
         topic: input.topic,
         type: input.type
-      },{
+      },
+      
+      {
         onSuccess:({gameId}) =>{
-          if (form.getValues("type")=="open_ended"){
-            router.push(`/play/open-ended/${gameId}`);
-          }else{
-            router.push(`/play/mcq/${gameId}`);
-          }
+          setFinished(true);
+          setTimeout(()=>{
+            if (form.getValues("type")=="open_ended"){
+              router.push(`/play/open-ended/${gameId}`);
+            }else{
+              router.push(`/play/mcq/${gameId}`);
+            }
+          }, 1000)
+        },
+        onError: () =>{
+          setShowLoader(false)
         }
-      })
+      }
+      );
      }
   
   form.watch();
+   if(showLoader){
+    return <LoadingQuestions finished={finished}/>
+   }
+
     return (
     <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'>
         <Card>
